@@ -1,18 +1,19 @@
-tutum-docker-influxdb
-=====================
-InfluxDB image
+docker-influxdb
+===============
+
+InfluxDB docker container.
 
 
 Usage
 -----
 
-To create the image `tutum/influxdb`, execute the following command on tutum-docker-influxdb folder:
+To create the image `bbinet/influxdb`, execute the following command on bbinet-docker-influxdb folder:
 
-    docker build -t tutum/influxdb .
+    docker build -t bbinet/influxdb .
 
 You can now push new image to the registry:
     
-    docker push tutum/influxdb
+    docker push bbinet/influxdb
 
 
 Running your InfluxDB image
@@ -20,7 +21,7 @@ Running your InfluxDB image
 
 Start your image binding the external ports `8083` and `8086` in all interfaces to your container. Ports `8090` and `8099` are only used for clustering and should not be exposed to the internet.
 
-    docker run -d -p 8083:8083 -p 8086:8086 --expose 8090 --expose 8099 tutum/influxdb
+    docker run -d -p 8083:8083 -p 8086:8086 --expose 8090 --expose 8099 bbinet/influxdb
 
 
 Configuring your InfluxDB
