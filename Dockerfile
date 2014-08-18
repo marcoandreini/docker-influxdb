@@ -1,4 +1,4 @@
-FROM ubuntu:trusty
+FROM debian:wheezy
 MAINTAINER Bruno Binet <bruno.binet@gmail.com>
  
 # Install InfluxDB
