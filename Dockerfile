@@ -15,7 +15,7 @@ ADD config.toml /config/config.toml
 ADD run.sh /run.sh
 RUN chmod +x /*.sh
 
-ENV PRE_CREATE_DB **None**
+ENV INFLUXDB_ROOT_PASSWORD **ChangeMe**
 
 # Admin server
 EXPOSE 8083
