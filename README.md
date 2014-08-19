@@ -4,32 +4,60 @@ docker-influxdb
 InfluxDB docker container.
 
 
-Usage
+Build
 -----
 
-To create the image `bbinet/influxdb`, execute the following command on bbinet-docker-influxdb folder:
+To create the image `bbinet/influxdb`, execute the following command in the
+`docker-influxdb` folder:
 
     docker build -t bbinet/influxdb .
 
-You can now push new image to the registry:
+You can now push the new image to the public registry:
     
     docker push bbinet/influxdb
 
 
-Running your InfluxDB image
---------------------------
+Configure and run
+-----------------
 
-Start your image binding the external ports `8083` and `8086` in all interfaces to your container. Ports `8090` and `8099` are only used for clustering and should not be exposed to the internet.
+You can configure the InfluxDB running container with some environment
+variables, see below.
 
-    docker run -d -p 8083:8083 -p 8086:8086 --expose 8090 --expose 8099 bbinet/influxdb
+Required:
 
+    - `INFLUXDB_ROOT_PASSWORD`: the password that must be set for the root
+      admin user.
 
-Configuring your InfluxDB
--------------------------
-Open your browse to access `localhost:8083` to configure InfluxDB. Fill the port which maps to `8086`. The default credential is `root:root`. Please change it as soon as possible.
+Optional:
 
-Alternatively, you can use RESTful API to talk to InfluxDB on port `8086`
+    - `INFLUXDB_DEFAULT_DB_NAME`: the name of the default database to create
+      (only set this env variable if you actually want a default database to be
+      automatically created).
+    - `INFLUXDB_DEFAULT_DB_USER`: the name of the admin user to create for the
+      above default database (only set this env variable if you actually want a
+      database admin user to be automatically created).
+    - `INFLUXDB_DEFAULT_DB_PASSWORD`: the password of the admin user to create
+      for the above default database.
 
-Initially Create Database
--------------------------
-Use `-e PRE_CREATE_DB="db1;db2;db3" to create database named "db1", "db2", and "db3" on the first time the container starts automatically. Each database name is separated by `;`.
+Then when starting your InfluxDB container, you will want to bind ports `8083`
+and `8086` from the InfluxDB container to the host external ports.
+InfluxDB container will write its `db`, `raft`, and `wal` data dirs to a data
+volume in `/data`, so you may want to bind this data volume to a host
+directory.
+
+For example:
+
+    $ docker pull bbinet/influxdb
+
+    $ docker run --name influxdb \
+          -v /home/influxdb/data:/data \
+          -p 8083:8083 -p 8086:8086 \
+          -e INFLUXDB_ROOT_PASSWORD=root_password \
+          -e INFLUXDB_DEFAULT_DB_NAME=metrics \
+          -e INFLUXDB_DEFAULT_DB_USER=admin \
+          -e INFLUXDB_DEFAULT_DB_PASSWORD=admin_password \
+          bbinet/influxdb
+
+Optionally, you may want to also expose ports `8090` and `8099` to your host
+since these are used for clustering, but they should not be exposed to the
+internet. So you will add `--expose 8090 --expose 8099` to the above example.
