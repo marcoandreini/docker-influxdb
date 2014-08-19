@@ -16,7 +16,7 @@ RET=1
 while [[ RET -ne 0 ]]; do
     echo "=> Waiting for confirmation of InfluxDB service startup ..."
     sleep 3 
-    curl http://localhost:8086/ping 2> /dev/null
+    curl -s -o /dev/null http://localhost:8086/ping
     RET=$?
 done
 echo ""
@@ -50,7 +50,7 @@ fi
 if [ "${INFLUXDB_DEFAULT_DB_NAME}" == "**None**" ]; then
     echo "=> No default database name supplied: no database will be created."
 else
-    curl -s "http://localhost:8086/db?u=root&p=${INFLUXDB_ROOT_PASSWORD}" | grep "{\"name\":\"${INFLUXDB_DEFAULT_DB_NAME}\"}"
+    curl -s "http://localhost:8086/db?u=root&p=${INFLUXDB_ROOT_PASSWORD}" | grep -q "\"name\":\"${INFLUXDB_DEFAULT_DB_NAME}\""
     if [ $? -eq 0 ]; then
         echo "=> Database \"${INFLUXDB_DEFAULT_DB_NAME}\" already exists: nothing to do."
     else
@@ -68,15 +68,15 @@ else
     if [ "${INFLUXDB_DEFAULT_DB_USER}" == "**None**" ]; then
         echo "=> No default database user supplied: no user will be created."
     else
-        if [ "${INFLUXDB_DEFAULT_DB_PASSWORD}" == "**None**" ]; then
-            echo "=> You must specify a password in INFLUXDB_DEFAULT_DB_PASSWORD env variable!"
-            echo "=> Program terminated!"
-            exit 1
-        fi
-        curl -s "http://localhost:8086/db/${INFLUXDB_DEFAULT_DB_NAME}/users?u=root&p=${INFLUXDB_ROOT_PASSWORD}" | grep "{\"name\":\"${INFLUXDB_DEFAULT_DB_USER}\"}"
+        curl -s "http://localhost:8086/db/${INFLUXDB_DEFAULT_DB_NAME}/users?u=root&p=${INFLUXDB_ROOT_PASSWORD}" | grep -q "\"name\":\"${INFLUXDB_DEFAULT_DB_USER}\""
         if [ $? -eq 0 ]; then
             echo "=> User \"${INFLUXDB_DEFAULT_DB_USER}\" already exists: nothing to do."
         else
+            if [ "${INFLUXDB_DEFAULT_DB_PASSWORD}" == "**None**" ]; then
+                echo "=> You must specify a password in INFLUXDB_DEFAULT_DB_PASSWORD env variable!"
+                echo "=> Program terminated!"
+                exit 1
+            fi
             echo "=> Creating user: ${INFLUXDB_DEFAULT_DB_USER}"
             STATUS=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db/${INFLUXDB_DEFAULT_DB_NAME}/users?u=root&p=${INFLUXDB_ROOT_PASSWORD}" -d "{\"name\":\"${INFLUXDB_DEFAULT_DB_USER}\", \"password\":\"${INFLUXDB_DEFAULT_DB_PASSWORD}\",\"admin\":true}")
             if test $STATUS -eq 200; then
