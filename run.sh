@@ -78,9 +78,13 @@ else
                 exit 1
             fi
             echo "=> Creating user: ${INFLUXDB_DEFAULT_DB_USER}"
-            STATUS=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db/${INFLUXDB_DEFAULT_DB_NAME}/users?u=root&p=${INFLUXDB_ROOT_PASSWORD}" -d "{\"name\":\"${INFLUXDB_DEFAULT_DB_USER}\", \"password\":\"${INFLUXDB_DEFAULT_DB_PASSWORD}\",\"admin\":true}")
+            STATUS=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db/${INFLUXDB_DEFAULT_DB_NAME}/users?u=root&p=${INFLUXDB_ROOT_PASSWORD}" -d "{\"name\":\"${INFLUXDB_DEFAULT_DB_USER}\", \"password\":\"${INFLUXDB_DEFAULT_DB_PASSWORD}\"}")
             if test $STATUS -eq 200; then
                 echo "=> User \"${INFLUXDB_DEFAULT_DB_USER}\" successfully created."
+                STATUS=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db/${INFLUXDB_DEFAULT_DB_NAME}/users/${INFLUXDB_DEFAULT_DB_USER}?u=root&p=${INFLUXDB_ROOT_PASSWORD}" -d "{\"admin\":true}")
+                if test $STATUS -ne 200; then
+                    echo "=> Failed to give admin rights to user: ${INFLUXDB_DEFAULT_DB_USER}"
+                fi
             else
                 echo "=> Failed to create user \"${INFLUXDB_DEFAULT_DB_USER}\"!"
                 echo "=> Program terminated!"
