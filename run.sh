@@ -47,5 +47,24 @@ else
     fi
 fi
 
+if [ "${INFLUXDB_DEFAULT_DB_NAME}" == "**None**" ]; then
+    echo "=> No default database name supplied: no database will be created."
+else
+    curl -s "http://localhost:8086/db?u=root&p=${INFLUXDB_ROOT_PASSWORD}" | grep "{\"name\":\"${INFLUXDB_DEFAULT_DB_NAME}\"}"
+    if [ $? -eq 0 ]; then
+        echo "=> Database \"${INFLUXDB_DEFAULT_DB_NAME}\" already exists: nothing to do."
+    else
+        echo "=> Creating database: ${INFLUXDB_DEFAULT_DB_NAME}"
+        STATUS=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db?u=root&p=${INFLUXDB_ROOT_PASSWORD}" -d "{\"name\":\"${INFLUXDB_DEFAULT_DB_NAME}\"}")
+        if test $STATUS -eq 201; then
+            echo "=> Database \"${INFLUXDB_DEFAULT_DB_NAME}\" successfully created."
+        else
+            echo "=> Failed to create database \"${INFLUXDB_DEFAULT_DB_NAME}\"!"
+            echo "=> Program terminated!"
+            exit 1
+        fi
+    fi
+fi
+
 fg
 
