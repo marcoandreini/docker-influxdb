@@ -16,6 +16,8 @@ ADD run.sh /run.sh
 RUN chmod +x /*.sh
 
 ENV INFLUXDB_DEFAULT_DB_NAME **None**
+ENV INFLUXDB_DEFAULT_DB_USER **None**
+ENV INFLUXDB_DEFAULT_DB_PASSWORD **None**
 ENV INFLUXDB_ROOT_PASSWORD **ChangeMe**
 
 # Admin server
