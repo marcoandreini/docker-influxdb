@@ -25,19 +25,19 @@ variables, see below.
 
 Required:
 
-    - `INFLUXDB_ROOT_PASSWORD`: the password that must be set for the root
-      admin user.
+- `INFLUXDB_ROOT_PASSWORD`: the password that must be set for the root
+  admin user.
 
 Optional:
 
-    - `INFLUXDB_DEFAULT_DB_NAME`: the name of the default database to create
-      (only set this env variable if you actually want a default database to be
-      automatically created).
-    - `INFLUXDB_DEFAULT_DB_USER`: the name of the admin user to create for the
-      above default database (only set this env variable if you actually want a
-      database admin user to be automatically created).
-    - `INFLUXDB_DEFAULT_DB_PASSWORD`: the password of the admin user to create
-      for the above default database.
+- `INFLUXDB_DEFAULT_DB_NAME`: the name of the default database to create
+  (only set this env variable if you actually want a default database to be
+  automatically created).
+- `INFLUXDB_DEFAULT_DB_USER`: the name of the admin user to create for the
+  above default database (only set this env variable if you actually want a
+  database admin user to be automatically created).
+- `INFLUXDB_DEFAULT_DB_PASSWORD`: the password of the admin user to create
+  for the above default database.
 
 Then when starting your InfluxDB container, you will want to bind ports `8083`
 and `8086` from the InfluxDB container to the host external ports.
