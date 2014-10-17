@@ -25,7 +25,7 @@ variables, see below.
 
 Required:
 
-- `INFLUXDB_ROOT_PASSWORD`: the password that must be set for the root
+- `ROOT_PASSWORD`: the password that must be set for the root
   admin user.
 
 Optional:
@@ -52,7 +52,7 @@ For example:
     $ docker run --name influxdb \
           -v /home/influxdb/data:/data \
           -p 8083:8083 -p 8086:8086 \
-          -e INFLUXDB_ROOT_PASSWORD=root_password \
+          -e ROOT_PASSWORD=root_password \
           -e INFLUXDB_DEFAULT_DB_NAME=metrics \
           -e INFLUXDB_DEFAULT_DB_USER=admin \
           -e INFLUXDB_DEFAULT_DB_PASSWORD=admin_password \
