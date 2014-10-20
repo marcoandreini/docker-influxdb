@@ -51,9 +51,14 @@ create_dbuser() {
     db=$1
     user=$2
     password=$3
-    admin=$4
+    admin=${4:-"false"}
     if [ -z "${db}" ] || [ -z "${user}" ] || [ -z "${password}" ] ; then
         echo "=> create_dbuser first 3 args are required (db, user, and password)."
+        echo "=> Program terminated!"
+        exit 1
+    fi
+    if [ "${admin}" != "true" ] && [ "${admin}" != "false" ]; then
+        echo "=> create_dbuser admin arg should be \"true\" or \"false\"."
         echo "=> Program terminated!"
         exit 1
     fi
@@ -74,21 +79,18 @@ create_dbuser() {
         status=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db/${db}/users?u=root&p=${ROOT_PASSWORD}" -d "{\"name\":\"${user}\", \"password\":\"${password}\"}")
         if test $status -eq 200; then
             echo "=> Db user \"${db}/${user}\" successfully created."
-
-            # if admin only
-            if [ -n "${admin}" ]; then
-                status=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db/${db}/users/${user}?u=root&p=${ROOT_PASSWORD}" -d "{\"admin\":true}")
-                if test $status -eq 200; then
-                    echo "=> Admin rights successfully granted to db user \"${db}/${user}\"."
-                else
-                    echo "=> Failed to give admin rights to db user: \"${db}/${user}\""
-                fi
-            fi
         else
             echo "=> Failed to create db user \"${db}/${user}\"!"
             echo "=> Program terminated!"
             exit 1
         fi
+    fi
+    # update admin rights
+    status=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db/${db}/users/${user}?u=root&p=${ROOT_PASSWORD}" -d "{\"admin\":${admin}}")
+    if test $status -eq 200; then
+        echo "=> Admin rights successfully updated for db user \"${db}/${user}\"."
+    else
+        echo "=> Failed to update admin rights for db user: \"${db}/${user}\""
     fi
 }
 
