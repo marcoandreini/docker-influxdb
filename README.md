@@ -36,8 +36,9 @@ Optional:
   automatically at startup (example: `PRE_CREATE_DBUSER_db1="user1;user2"`)
 - `<database>_<dbuser>_PASSWORD`: the password of the dbuser to create
   for the above database (example: `db1_user1_PASSWORD="mypass"`)
-- `<database>_<dbuser>_ADMIN`: set if the dbuser to create should be granted
-  admin rights for the above database (example: `db1_user1_ADMIN=ok`)
+- `<database>_<dbuser>_ADMIN`: ["true" or "false"] wether the dbuser to create
+  should be granted admin rights for the above database (example:
+  `db1_user1_ADMIN=true`)
 
 Then when starting your InfluxDB container, you will want to bind ports `8083`
 and `8086` from the InfluxDB container to the host external ports.
