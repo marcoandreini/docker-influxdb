@@ -100,8 +100,13 @@ if [ "${ROOT_PASSWORD}" == "**ChangeMe**" ]; then
     exit 1
 fi
 
+CONFIG_FILE="/config/config.toml"
+
+#Dynamically change the value of 'max-open-shards' to what 'ulimit -n' returns
+sed -i "s/^max-open-shards.*/max-open-shards = $(ulimit -n)/" ${CONFIG_FILE}
+
 echo "=> Starting InfluxDB ..."
-exec /usr/bin/influxdb -config=/config/config.toml &
+exec /usr/bin/influxdb -config=${CONFIG_FILE} &
 
 # wait for InfluxDB to start
 ret=1
