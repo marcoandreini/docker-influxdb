@@ -33,7 +33,7 @@ create_db() {
     db=$1
     curl -s "http://localhost:8086/db?u=root&p=${ROOT_PASSWORD}" | grep -q "\"name\":\"${db}\""
     if [ $? -eq 0 ]; then
-        echo "=> Database \"${db}\" already exists: nothing to do."
+        echo "=> Database \"${db}\" already exists."
     else
         echo "=> Creating database: ${db}"
         status=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db?u=root&p=${ROOT_PASSWORD}" -d "{\"name\":\"${db}\"}")
@@ -59,33 +59,33 @@ create_dbuser() {
     fi
     curl -s "http://localhost:8086/db/${db}/users?u=root&p=${ROOT_PASSWORD}" | grep -q "\"name\":\"${user}\""
     if [ $? -eq 0 ]; then
-        echo "=> User \"${user}\" already exists: trying to update the password."
+        echo "=> Db user \"${db}/${user}\" already exists: trying to update the password."
         # let's update the user password
         status=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db/${db}/users/${user}?u=root&p=${ROOT_PASSWORD}" -d "{\"password\": \"${password}\"}")
         if test $status -eq 200; then
-            echo "=> ${db}/${user} dbuser password successfully updated."
+            echo "=> Password for db user \"${db}/${user}\" successfully updated."
         else
-            echo "=> Failed to update ${db}/${user} dbuser password!"
+            echo "=> Failed to update password for \"${db}/${user}\" db user!"
             echo "=> Program terminated!"
             exit 1
         fi
     else
-        echo "=> Creating user: ${user}"
+        echo "=> Creating db user: \"${db}/${user}\""
         status=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db/${db}/users?u=root&p=${ROOT_PASSWORD}" -d "{\"name\":\"${user}\", \"password\":\"${password}\"}")
         if test $status -eq 200; then
-            echo "=> User \"${user}\" successfully created."
+            echo "=> Db user \"${db}/${user}\" successfully created."
 
             # if admin only
             if [ -n "${admin}" ]; then
                 status=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db/${db}/users/${user}?u=root&p=${ROOT_PASSWORD}" -d "{\"admin\":true}")
                 if test $status -eq 200; then
-                    echo "=> Admin rights successfully granted to user \"${user}\"."
+                    echo "=> Admin rights successfully granted to db user \"${db}/${user}\"."
                 else
-                    echo "=> Failed to give admin rights to user: ${user}"
+                    echo "=> Failed to give admin rights to db user: \"${db}/${user}\""
                 fi
             fi
         else
-            echo "=> Failed to create user \"${user}\"!"
+            echo "=> Failed to create db user \"${db}/${user}\"!"
             echo "=> Program terminated!"
             exit 1
         fi
@@ -102,13 +102,13 @@ fi
 
 CONFIG_FILE="/config/config.toml"
 
-#Dynamically change the value of 'max-open-shards' to what 'ulimit -n' returns
+# Dynamically change the value of 'max-open-shards' to what 'ulimit -n' returns
 sed -i "s/^max-open-shards.*/max-open-shards = $(ulimit -n)/" ${CONFIG_FILE}
 
 echo "=> Starting InfluxDB ..."
 exec /usr/bin/influxdb -config=${CONFIG_FILE} &
 
-# wait for InfluxDB to start
+# Wait for InfluxDB to start
 ret=1
 while [[ ret -ne 0 ]]; do
     echo "=> Waiting for confirmation of InfluxDB service startup ..."
@@ -137,8 +137,6 @@ else
         fi
     done
 fi
-
-
 
 fg
 
