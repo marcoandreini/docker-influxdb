@@ -30,14 +30,14 @@ Required:
 
 Optional:
 
-- `INFLUXDB_DEFAULT_DB_NAME`: the name of the default database to create
-  (only set this env variable if you actually want a default database to be
-  automatically created).
-- `INFLUXDB_DEFAULT_DB_USER`: the name of the admin user to create for the
-  above default database (only set this env variable if you actually want a
-  database admin user to be automatically created).
-- `INFLUXDB_DEFAULT_DB_PASSWORD`: the password of the admin user to create
-  for the above default database.
+- `PRE_CREATE_DB`: the list of the databases to create automatically at startup
+  (example: `PRE_CREATE_DB="db1;db2;db3"`)
+- `PRE_CREATE_DBUSER_<database>`: the list of the database users to create
+  automatically at startup (example: `PRE_CREATE_DBUSER_db1="user1;user2"`)
+- `<database>_<dbuser>_PASSWORD`: the password of the dbuser to create
+  for the above database (example: `db1_user1_PASSWORD="mypass"`)
+- `<database>_<dbuser>_ADMIN`: set if the dbuser to create should be granted
+  admin rights for the above database (example: `db1_user1_ADMIN=ok`)
 
 Then when starting your InfluxDB container, you will want to bind ports `8083`
 and `8086` from the InfluxDB container to the host external ports.
