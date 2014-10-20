@@ -17,6 +17,10 @@ ADD run.sh /run.sh
 RUN chmod +x /*.sh
 
 ENV ROOT_PASSWORD **ChangeMe**
+# ENV PRE_CREATE_DB db1;db2;db3
+# ENV PRE_CREATE_DBUSER_db1 user1;user2
+# ENV db1_user1_PASSWORD mypass
+# ENV db1_user1_ADMIN ok
 
 # Admin server
 EXPOSE 8083
