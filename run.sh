@@ -2,6 +2,14 @@
 
 set -m
 
+
+abort() {
+    echo "=> Environment was:"
+    env
+    echo "=> Program terminated!"
+    exit 1
+}
+
 check_update_root_password() {
     # check if default root password "root" is still valid
     status=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8086/cluster_admins?u=root&p=root")
@@ -12,8 +20,7 @@ check_update_root_password() {
             echo "=> InfluxDB root password successfully updated."
         else
             echo "=> Failed to update InfluxDB root password!"
-            echo "=> Program terminated!"
-            exit 1
+            abort
         fi
     else
         # default root password "root" has already been changed
@@ -23,8 +30,7 @@ check_update_root_password() {
             echo "=> Password supplied for InfluxDB root user is already ok." 
         else
             echo "=> Password supplied for InfluxDB root user is wrong!"
-            echo "=> Program terminated!"
-            exit 1
+            abort
         fi
     fi
 }
@@ -41,8 +47,7 @@ create_db() {
             echo "=> Database \"${db}\" successfully created."
         else
             echo "=> Failed to create database \"${db}\"!"
-            echo "=> Program terminated!"
-            exit 1
+            abort
         fi
     fi
 }
@@ -54,13 +59,12 @@ create_dbuser() {
     admin=${4:-"false"}
     if [ -z "${db}" ] || [ -z "${user}" ] || [ -z "${password}" ] ; then
         echo "=> create_dbuser first 3 args are required (db, user, and password)."
-        echo "=> Program terminated!"
-        exit 1
+        abort
     fi
     if [ "${admin}" != "true" ] && [ "${admin}" != "false" ]; then
-        echo "=> create_dbuser admin arg should be \"true\" or \"false\"."
-        echo "=> Program terminated!"
-        exit 1
+        echo "=> Wrong value for create_dbuser admin arg: ${admin}"
+        echo "   Value should be either \"true\" or \"false\"."
+        abort
     fi
     curl -s "http://localhost:8086/db/${db}/users?u=root&p=${ROOT_PASSWORD}" | grep -q "\"name\":\"${user}\""
     if [ $? -eq 0 ]; then
@@ -71,8 +75,7 @@ create_dbuser() {
             echo "=> Password for db user \"${db}/${user}\" successfully updated."
         else
             echo "=> Failed to update password for \"${db}/${user}\" db user!"
-            echo "=> Program terminated!"
-            exit 1
+            abort
         fi
     else
         echo "=> Creating db user: \"${db}/${user}\""
@@ -81,8 +84,7 @@ create_dbuser() {
             echo "=> Db user \"${db}/${user}\" successfully created."
         else
             echo "=> Failed to create db user \"${db}/${user}\"!"
-            echo "=> Program terminated!"
-            exit 1
+            abort
         fi
     fi
     # update admin rights
@@ -98,8 +100,7 @@ create_dbuser() {
 
 if [ "${ROOT_PASSWORD}" == "**ChangeMe**" ]; then
     echo "=> No password is specified for InfluxDB root user!"
-    echo "=> Program terminated!"
-    exit 1
+    abort
 fi
 
 CONFIG_FILE="/config/config.toml"
