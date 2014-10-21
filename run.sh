@@ -57,6 +57,7 @@ create_dbuser() {
     user=$2
     password=$3
     admin=${4:-"false"}
+    admin=${admin,,} # convert to lowercase
     if [ -z "${db}" ] || [ -z "${user}" ] || [ -z "${password}" ] ; then
         echo "=> create_dbuser first 3 args are required (db, user, and password)."
         abort
