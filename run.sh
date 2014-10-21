@@ -88,8 +88,14 @@ create_dbuser() {
             abort
         fi
     fi
+
     # update admin rights
-    status=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db/${db}/users/${user}?u=root&p=${ROOT_PASSWORD}" -d "{\"admin\":${admin}}")
+    if [ "${admin}" == "true" ]; then
+        data="{\"admin\":\"true\",\"name\":\"${user}\",\"readFrom\":\".*\",\"writeTo\":\".*\"}"
+    else
+        data="{\"admin\":\"false\",\"name\":\"${user}\",\"readFrom\":\".*\",\"writeTo\":\"^$\"}"
+    fi
+    status=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db/${db}/users/${user}?u=root&p=${ROOT_PASSWORD}" -d "${data}")
     if test $status -eq 200; then
         echo "=> Admin rights successfully updated for db user \"${db}/${user}\"."
     else
