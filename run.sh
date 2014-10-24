@@ -111,9 +111,12 @@ if [ "${ROOT_PASSWORD}" == "**ChangeMe**" ]; then
 fi
 
 CONFIG_FILE="/config/config.toml"
+MAX_OPEN_FILES=${MAX_OPEN_FILES:-32768}
 
-# Dynamically change the value of 'max-open-shards' to what 'ulimit -n' returns
-sed -i "s/^max-open-shards.*/max-open-shards = $(ulimit -n)/" ${CONFIG_FILE}
+# Dynamically change both ulimit value and the 'max-open-shards' value in
+# influxdb config
+ulimit -n ${MAX_OPEN_FILES}
+sed -i "s/^max-open-shards.*/max-open-shards = ${MAX_OPEN_FILES}/" ${CONFIG_FILE}
 
 echo "=> Starting InfluxDB ..."
 exec /usr/bin/influxdb -config=${CONFIG_FILE} &
