@@ -91,11 +91,16 @@ create_dbuser() {
 
     # update admin rights
     if [ "${admin}" == "true" ]; then
-        data="{\"admin\":\"true\",\"name\":\"${user}\",\"readFrom\":\".*\",\"writeTo\":\".*\"}"
+        data1="{\"admin\":\"true\"}"
+        data2="{\"name\":\"${user}\",\"readFrom\":\".*\",\"writeTo\":\".*\"}"
     else
-        data="{\"admin\":\"false\",\"name\":\"${user}\",\"readFrom\":\".*\",\"writeTo\":\"^$\"}"
+        data1="{\"admin\":\"false\"}"
+        data2="{\"name\":\"${user}\",\"readFrom\":\".*\",\"writeTo\":\"^$\"}"
     fi
-    status=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db/${db}/users/${user}?u=root&p=${ROOT_PASSWORD}" -d "${data}")
+    status=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db/${db}/users/${user}?u=root&p=${ROOT_PASSWORD}" -d "${data1}")
+    if test $status -eq 200; then
+        status=$(curl -X POST -s -o /dev/null -w "%{http_code}" "http://localhost:8086/db/${db}/users/${user}?u=root&p=${ROOT_PASSWORD}" -d "${data2}")
+    fi
     if test $status -eq 200; then
         echo "=> Admin rights successfully updated for db user \"${db}/${user}\"."
     else
