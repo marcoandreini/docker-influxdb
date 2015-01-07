@@ -1,10 +1,10 @@
 FROM debian:wheezy
 MAINTAINER Bruno Binet <bruno.binet@gmail.com>
- 
+
 RUN apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends curl ca-certificates
 
-ENV INFLUXDB_VERSION 0.8.7
+ENV INFLUXDB_VERSION 0.8.8
 
 # Install InfluxDB
 RUN curl -s -o /tmp/influxdb_${INFLUXDB_VERSION}_amd64.deb http://s3.amazonaws.com/influxdb/influxdb_${INFLUXDB_VERSION}_amd64.deb && \
