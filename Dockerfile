@@ -1,5 +1,5 @@
-FROM debian:wheezy
-MAINTAINER Bruno Binet <bruno.binet@gmail.com>
+FROM debian:jessie
+MAINTAINER Marco Andreini <marco.andreini@gmail.com>
 
 RUN apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends curl ca-certificates
