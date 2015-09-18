@@ -12,7 +12,6 @@ RUN curl -s -o /tmp/influxdb_${INFLUXDB_VERSION}_amd64.deb http://s3.amazonaws.c
   rm /tmp/influxdb_${INFLUXDB_VERSION}_amd64.deb && \
   rm -rf /var/lib/apt/lists/*
 
-ADD config.toml /config/config.toml
 ADD run.sh /run.sh
 RUN chmod +x /*.sh
 
@@ -37,6 +36,6 @@ EXPOSE 8086
 # Protobuf port (for clustering, don't expose publicly!)
 #EXPOSE 8099
 
-VOLUME ["/data"]
+VOLUME ["/var/opt/influxdb"]
 
 CMD ["/run.sh"]
